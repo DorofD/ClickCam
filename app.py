@@ -4,6 +4,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
 import datetime
+# pyinstaller main.spec
+i = 0
 
 
 class Window(QMainWindow):
@@ -11,10 +13,11 @@ class Window(QMainWindow):
         super().__init__()
 
         # setting title
-        self.setWindowTitle("Python ")
-
+        self.setWindowTitle("ssPyQt5")
+        self.count_label = QLabel(f'Нажатий: {i}', self)
+        self.count_label.setGeometry(50, 30, 100, 40)
         # setting geometry
-        self.setGeometry(0, 0, 600, 150)
+        self.setGeometry(0, 0, 600, 100)
 
         # calling method
         self.UiComponents()
@@ -23,16 +26,20 @@ class Window(QMainWindow):
         self.show()
 
     # method for widgets
-    def UiComponents(self):
 
+    def UiComponents(self):
+        global i
+        # count_label = QLabel("My text")
+        # count_label = QLabel(f'Нажатий: {i}', self)
+        # count_label.setGeometry(50, 30, 100, 40)
         # creating a push button
-        button = QPushButton("CLICK", self)
+        button = QPushButton("Нажать!", self)
 
         # setting geometry of button
-        button.setGeometry(100, 10, 100, 40)
+        button.setGeometry(250, 30, 100, 40)
 
         # setting name
-        button.setAccessibleName("push button")
+        # button.setAccessibleName("button")
 
         # adding action to a button
         button.clicked.connect(self.clickme)
@@ -40,10 +47,11 @@ class Window(QMainWindow):
         # accessing the name of button
         name = button.accessibleName()
 
-        # creating a label to display a name
-        label = QLabel(self)
-        label.setText(name)
-        label.move(200, 200)
+        # creating a count_label to display a name
+        button_label = QLabel(self)
+        button_label.setText(
+            'Нажмите на кнопку\n    или на пробел')
+        button_label.move(250, 70)
 
     # action method
     def clickme(self):
@@ -54,7 +62,11 @@ class Window(QMainWindow):
         screenshot.save(f'screenshots\{time}.jpg', 'jpg')
         # printing pressed
         # pyscreenshot.grab().save(f"sas.png")
+        global i
+        i += 1
         print("pressed")
+        print(i)
+        self.count_label.setText(f'Нажатий: {i}')
         # image.save(f"{time}.png")
 
         # create pyqt5 app
@@ -62,32 +74,5 @@ App = QApplication(sys.argv)
 
 # create the instance of our Window
 window = Window()
-
 # start the app
 sys.exit(App.exec())
-
-
-# from PyQt5 import QtWidgets
-# import sys
-
-# app = QtWidgets.QApplication(sys.argv)
-# w = QtWidgets.QWidget()
-
-# grab_btn = QtWidgets.QPushButton('Grab Screen')
-
-
-# def click_handler():
-#     screen = QtWidgets.QApplication.primaryScreen()
-#     screenshot = screen.grabWindow(0, 0, 0, 1000, 1000)
-#     screenshot.save('shot.jpg', 'jpg')
-#     # w.close()
-
-
-# grab_btn.clicked.connect(click_handler)
-
-# layout = QtWidgets.QVBoxLayout()
-# layout.addWidget(grab_btn)
-# w.setLayout(layout)
-# w.show()
-
-# sys.exit(app.exec_())
