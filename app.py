@@ -15,7 +15,7 @@ class Window(QMainWindow):
         self.lock_flag = True
         # setting title
         self.setWindowTitle("ssPyQt5")
-        self.count_label = QLabel(f'Нажатий: {self.i}', self)
+        self.count_label = QLabel(f'Нажатий:', self)
         # отступ от левого края / отступ сверху / длина / высота
         self.count_label.setGeometry(20, 30, 100, 40)
         self.shops_combo = QComboBox(self)
@@ -27,6 +27,8 @@ class Window(QMainWindow):
         self.main_button.setEnabled(False)
         self.work_dir = ''
         self.work_dir_label = QLabel('Рабочая директория: ', self)
+        self.save_status = QLabel('', self)
+        self.save_status.setGeometry(20, 120, 270, 40)
         # setting geometry
         # общее окно
         # отступ от левого края / отступ сверху / длина / высота
@@ -64,22 +66,22 @@ class Window(QMainWindow):
         self.shops_combo.addItem('Магазин 2')
         self.shops_combo.addItem('Магазин 3')
         self.shops_combo.resize(200, 30)
-        self.shops_combo.move(360, 15)
+        self.shops_combo.move(360, 55)
 
         shops_label = QLabel(self)
         shops_label.setText('Магазин:')
-        shops_label.move(300, 15)
+        shops_label.move(300, 55)
 
         # список операторов
         self.operators_combo.addItem('Оператор 1')
         self.operators_combo.addItem('Оператор 2')
         self.operators_combo.addItem('Оператор 3')
         self.operators_combo.resize(200, 30)
-        self.operators_combo.move(360, 55)
+        self.operators_combo.move(360, 15)
 
         operators_label = QLabel(self)
         operators_label.setText('Оператор:')
-        operators_label.move(300, 55)
+        operators_label.move(300, 15)
 
         # список проходов
         self.passage_combo.addItem('1')
@@ -114,12 +116,11 @@ class Window(QMainWindow):
         screenshot = screen.grabWindow(0, 0, 0, -1, -1)
         now = datetime.datetime.now()
         time = (str(now).replace(':', '.'))
-        screenshot.save(f'{self.work_dir}/{time}.jpg', 'jpg')
-
+        if not screenshot.save(f'{self.work_dir}/{time}.jpg', 'jpg'):
+            self.save_status.setText(
+                'Ошибка сохранения! Обратитесь к администратору')
+            self.save_status.setStyleSheet('background-color: red')
         self.i += 1
-        print("pressed")
-        print(self.i)
-        sas = self.shops_combo.currentText()
         self.count_label.setText(f'Нажатий: {self.i}')
 
     def lock(self):
