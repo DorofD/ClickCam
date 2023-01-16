@@ -2,3 +2,5 @@
 /build
 /screenshots
 /venv
+/__pycache__
+database.db

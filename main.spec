@@ -8,7 +8,7 @@ a = Analysis(
     ['app.py'],
     pathex=[],
     binaries=[],
-    datas=[('C:/Users/pc/Desktop/CamScreen', 'UI')],
+    datas=[('C:/Users/Dorofeev.E.BOOKCENTRE/Desktop/screenshotsPyQt5', 'UI')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
