@@ -19,7 +19,7 @@ def create_db():
     """
     cursor.execute(query)
 
-    query = """CREATE TABLE IF NOT EXISTS operations (
+    query = """CREATE TABLE IF NOT EXISTS notes (
         note INTEGER NOT NULL UNIQUE,
         shop_name TEXT NOT NULL UNIQUE
     )
@@ -31,7 +31,6 @@ def create_db():
 
 
 def add_note(operator):
-    today = datetime.date.today()
     pass
 
 
@@ -46,8 +45,34 @@ def make_directory(operator, shop, passage):
     return result
 
 
-def boba(sas):
-    print(sas)
+def get_shops():
+    conn = sq.connect('database.db')
+    cursor = conn.cursor()
+    query = f"""SELECT * FROM shops"""
+    cursor.execute(query)
+    shops = cursor.fetchall()
+    conn.close()
+    result = []
+    for shop in shops:
+        result.append(f'{str(shop[0])} {str(shop[1])}')
+    print('GET SHOPS')
+    return result
 
 
-create_db()
+def get_operators():
+    conn = sq.connect('database.db')
+    cursor = conn.cursor()
+    query = f"""SELECT * FROM operators"""
+    cursor.execute(query)
+    operators = cursor.fetchall()
+    conn.close()
+    result = []
+    for operator in operators:
+        result.append(str(operator[0]))
+    return result
+# create_db()
+# for b in a:
+#     print(f'{str(b[0])} {str(b[1])}')
+
+
+print(get_operators())

@@ -62,9 +62,9 @@ class Window(QMainWindow):
         button_label.move(120, 70)
 
         # список магазинов
-        self.shops_combo.addItem('Магазин 1')
-        self.shops_combo.addItem('Магазин 2')
-        self.shops_combo.addItem('Магазин 3')
+        shops = model.get_shops()
+        for shop in shops:
+            self.shops_combo.addItem(shop)
         self.shops_combo.resize(200, 30)
         self.shops_combo.move(360, 55)
 
@@ -73,9 +73,9 @@ class Window(QMainWindow):
         shops_label.move(300, 55)
 
         # список операторов
-        self.operators_combo.addItem('Оператор 1')
-        self.operators_combo.addItem('Оператор 2')
-        self.operators_combo.addItem('Оператор 3')
+        operators = model.get_operators()
+        for operator in operators:
+            self.operators_combo.addItem(operator)
         self.operators_combo.resize(200, 30)
         self.operators_combo.move(360, 15)
 
