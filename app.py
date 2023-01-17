@@ -30,7 +30,7 @@ class Window(QMainWindow):
         self.save_status = QLabel('', self)
         self.save_status.setGeometry(20, 120, 270, 40)
         # setting geometry
-        # общее окно
+        # главное окно
         # отступ от левого края / отступ сверху / длина / высота
         self.setGeometry(300, 700, 650, 200)
 

@@ -1,6 +1,7 @@
 import sqlite3 as sq
 import os
 import datetime
+import openpyxl
 
 
 def create_db():
@@ -55,7 +56,6 @@ def get_shops():
     result = []
     for shop in shops:
         result.append(f'{str(shop[0])} {str(shop[1])}')
-    print('GET SHOPS')
     return result
 
 
@@ -70,9 +70,35 @@ def get_operators():
     for operator in operators:
         result.append(str(operator[0]))
     return result
+
+
+def import_shops():
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = """
+            DELETE FROM shops
+        """
+        cursor.execute(query)
+        wb = openpyxl.load_workbook('shops.xlsx')  # подключение листа Excel
+        sheet = wb.active
+        # range(len(sheet["A"]) - 1)
+        for i in range(len(sheet["A"])):
+            if sheet['A'][i].value:
+                query = f""" 
+                    INSERT INTO shops (pid, shop_name) 
+                    VALUES ('{sheet['A'][i].value}',
+                    '{sheet['B'][i].value}')
+                """
+                cursor.execute(query)
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
+
+
 # create_db()
-# for b in a:
-#     print(f'{str(b[0])} {str(b[1])}')
-
-
-print(get_operators())
+# print(import_shops())
