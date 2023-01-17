@@ -3,7 +3,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
-import datetime
 import model
 # pyinstaller main.spec
 
@@ -21,7 +20,6 @@ class Window(QMainWindow):
         self.shops_combo = QComboBox(self)
         self.operators_combo = QComboBox(self)
         self.passage_combo = QComboBox(self)
-        self.gmt_combo = QComboBox(self)
         self.lock_button = QPushButton(self)
         self.main_button = QPushButton("Нажать!", self)
         self.main_button.setEnabled(False)
@@ -29,6 +27,9 @@ class Window(QMainWindow):
         self.work_dir_label = QLabel('Рабочая директория: ', self)
         self.save_status = QLabel('', self)
         self.save_status.setGeometry(20, 120, 270, 40)
+        self.time_label = QLabel(self)
+        self.time_label.setText('Разница во времени с Москвой:')
+        self.time_difference = 0
         # setting geometry
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
@@ -84,11 +85,8 @@ class Window(QMainWindow):
         operators_label.move(300, 15)
 
         # список проходов
-        self.passage_combo.addItem('1')
-        self.passage_combo.addItem('2')
-        self.passage_combo.addItem('3')
-        self.passage_combo.addItem('4')
-        self.passage_combo.addItem('5')
+        for i in range(1, 6):
+            self.passage_combo.addItem(str(i))
         self.passage_combo.resize(200, 30)
         self.passage_combo.move(360, 95)
 
@@ -96,16 +94,9 @@ class Window(QMainWindow):
         passage_label.setText('Проход:')
         passage_label.move(300, 95)
 
-        # список часовых поясов
-        self.gmt_combo.addItem('+ 1')
-        self.gmt_combo.addItem('+ 2')
-        self.gmt_combo.addItem('+ 3')
-        self.gmt_combo.resize(200, 30)
-        self.gmt_combo.move(360, 135)
-
-        gmt_label = QLabel(self)
-        gmt_label.setText('GMT:')
-        gmt_label.move(300, 135)
+        # разница во времени
+        self.time_label.resize(200, 30)
+        self.time_label.move(300, 135)
 
         # рабочая директория
         self.work_dir_label.move(50, 170)
@@ -114,9 +105,9 @@ class Window(QMainWindow):
     def clickme(self):
         screen = QtWidgets.QApplication.primaryScreen()
         screenshot = screen.grabWindow(0, 0, 0, -1, -1)
-        now = datetime.datetime.now()
-        time = (str(now).replace(':', '.'))
-        if not screenshot.save(f'{self.work_dir}/{time}.jpg', 'jpg'):
+        # now = datetime.datetime.now()
+        # time = (str(now).replace(':', '.'))
+        if not screenshot.save(model.make_screenshot_name(self.work_dir, self.time_difference), 'jpg'):
             self.save_status.setText(
                 'Ошибка сохранения! Обратитесь к администратору')
             self.save_status.setStyleSheet('background-color: red')
@@ -131,11 +122,16 @@ class Window(QMainWindow):
             self.shops_combo.setEnabled(False)
             self.operators_combo.setEnabled(False)
             self.passage_combo.setEnabled(False)
-            self.gmt_combo.setEnabled(False)
+            # self.gmt_combo.setEnabled(False)
             self.lock_flag = False
             self.work_dir = model.make_directory(self.operators_combo.currentText(),
                                                  self.shops_combo.currentText(),
                                                  self.passage_combo.currentText())
+            self.time_difference = model.find_time_difference(
+                self.shops_combo.currentText())
+
+            self.time_label.setText(
+                f'Разница во времени с Москвой: {self.time_difference}')
             self.work_dir_label.setText(f'Рабочая директория: {self.work_dir}')
         else:
             # деактивация кнопки счетчика
@@ -144,7 +140,6 @@ class Window(QMainWindow):
             self.shops_combo.setEnabled(True)
             self.operators_combo.setEnabled(True)
             self.passage_combo.setEnabled(True)
-            self.gmt_combo.setEnabled(True)
             self.lock_flag = True
         # self.work_dir_label.setText(f'Рабочая директория: ')
 

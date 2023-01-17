@@ -7,9 +7,9 @@ import openpyxl
 def create_db():
     conn = sq.connect('database.db')
     cursor = conn.cursor()
-    query = """CREATE TABLE IF NOT EXISTS shops ( 
-        pid INTEGER NOT NULL UNIQUE,
-        shop_name TEXT NOT NULL UNIQUE
+    query = """CREATE TABLE IF NOT EXISTS shops (
+        shop_name TEXT NOT NULL UNIQUE,
+        time_difference INTEGER
     )
     """
     cursor.execute(query)
@@ -31,10 +31,6 @@ def create_db():
     conn.close()
 
 
-def add_note(operator):
-    pass
-
-
 def make_directory(operator, shop, passage):
     today = datetime.date.today()
     # print(operator)
@@ -47,29 +43,39 @@ def make_directory(operator, shop, passage):
 
 
 def get_shops():
-    conn = sq.connect('database.db')
-    cursor = conn.cursor()
-    query = f"""SELECT * FROM shops"""
-    cursor.execute(query)
-    shops = cursor.fetchall()
-    conn.close()
-    result = []
-    for shop in shops:
-        result.append(f'{str(shop[0])} {str(shop[1])}')
-    return result
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = f"""SELECT * FROM shops"""
+        cursor.execute(query)
+        shops = cursor.fetchall()
+        conn.close()
+        result = []
+        for shop in shops:
+            result.append(f'{str(shop[0])}')
+        return result
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
 
 
 def get_operators():
-    conn = sq.connect('database.db')
-    cursor = conn.cursor()
-    query = f"""SELECT * FROM operators"""
-    cursor.execute(query)
-    operators = cursor.fetchall()
-    conn.close()
-    result = []
-    for operator in operators:
-        result.append(str(operator[0]))
-    return result
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = f"""SELECT * FROM operators"""
+        cursor.execute(query)
+        operators = cursor.fetchall()
+        conn.close()
+        result = []
+        for operator in operators:
+            result.append(str(operator[0]))
+        return result
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
 
 
 def import_shops():
@@ -83,10 +89,10 @@ def import_shops():
         wb = openpyxl.load_workbook('shops.xlsx')  # подключение листа Excel
         sheet = wb.active
         # range(len(sheet["A"]) - 1)
-        for i in range(len(sheet["A"])):
+        for i in range(1, len(sheet["A"])):
             if sheet['A'][i].value:
-                query = f""" 
-                    INSERT INTO shops (pid, shop_name) 
+                query = f"""
+                    INSERT INTO shops (shop_name, time_difference)
                     VALUES ('{sheet['A'][i].value}',
                     '{sheet['B'][i].value}')
                 """
@@ -100,5 +106,35 @@ def import_shops():
         return False
 
 
+def find_time_difference(shop):
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = f"""SELECT time_difference FROM shops
+                    WHERE shop_name ='{shop}'"""
+        cursor.execute(query)
+        result = cursor.fetchall()
+        conn.commit()
+        conn.close()
+        return int(result[0][0])
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
+
+
+def make_screenshot_name(work_dir, difference):
+    dif = datetime.timedelta(hours=difference)
+    now = datetime.datetime.now() + dif
+    time = (str(now).replace(':', '.'))
+    result = f'{work_dir}/{time}.jpg'
+    return result
+
+
+def add_note():
+    pass
+
+
 # create_db()
 # print(import_shops())
+# print(find_time_difference('945 Хабаровск 2 (город)'))
