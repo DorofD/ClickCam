@@ -2,9 +2,8 @@ import os
 import datetime
 today = datetime.date.today()
 now = datetime.datetime.now()
-if not os.path.exists('screenshots/sas/залупа 1'):
-    os.makedirs('screenshots/sas/залупа 1')
-print(today)
+# if not os.path.exists('screenshots/sas/залупа 1'):
+#     os.makedirs('screenshots/sas/залупа 1')
 # os.makedirs('залупа1')
 
 # print(os.getcwd())
@@ -13,5 +12,6 @@ print(today)
 
 dif = datetime.timedelta(hours=3)
 
+print(today)
 print(now)
 print(now + dif)

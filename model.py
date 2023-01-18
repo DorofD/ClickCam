@@ -21,8 +21,15 @@ def create_db():
     cursor.execute(query)
 
     query = """CREATE TABLE IF NOT EXISTS notes (
-        note INTEGER NOT NULL UNIQUE,
-        shop_name TEXT NOT NULL UNIQUE
+	id INTEGER NOT NULL UNIQUE,
+	operator TEXT NOT NULL,
+	date TEXT NOT NULL,
+	time_msk TEXT NOT NULL,
+	time_local TEXT NOT NULL,
+	shop_name TEXT NOT NULL,
+	passage	TEXT NOT NULL,
+	ss_path	TEXT NOT NULL,
+	PRIMARY KEY(id AUTOINCREMENT)
     )
     """
     cursor.execute(query)
@@ -123,16 +130,44 @@ def find_time_difference(shop):
         return False
 
 
-def make_screenshot_name(work_dir, difference):
+def make_screenshot_name(work_dir, difference, operator, shop_name, passage):
+    today = datetime.date.today()
     dif = datetime.timedelta(hours=difference)
-    now = datetime.datetime.now() + dif
-    time = (str(now).replace(':', '.'))
+    time_msk = datetime.datetime.now()
+    time_local = time_msk + dif
+    time = (str(time_local).replace(':', '.'))
     result = f'{work_dir}/{time}.jpg'
+    if not add_note(operator, today, time_msk, time_local,
+                    shop_name, passage, result):
+        return False
     return result
 
 
-def add_note():
-    pass
+def add_note(operator, date, time_msk, time_local, shop_name, passage, path):
+    try:
+        ss_path = path.replace('/', '\\')
+        ss_path = f'\\{ss_path}'
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = f"""
+                    INSERT INTO notes (operator, date, time_msk, time_local, shop_name, passage, ss_path)
+                    VALUES ('{operator}',
+                    '{date}',
+                    '{time_msk}',
+                    '{time_local}',
+                    '{shop_name}',
+                    '{passage}',
+                    '{ss_path}'
+                    )
+                """
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
 
 
 # create_db()

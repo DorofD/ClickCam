@@ -85,7 +85,7 @@ class Window(QMainWindow):
         operators_label.move(300, 15)
 
         # список проходов
-        for i in range(1, 6):
+        for i in range(1, 7):
             self.passage_combo.addItem(str(i))
         self.passage_combo.resize(200, 30)
         self.passage_combo.move(360, 95)
@@ -107,7 +107,11 @@ class Window(QMainWindow):
         screenshot = screen.grabWindow(0, 0, 0, -1, -1)
         # now = datetime.datetime.now()
         # time = (str(now).replace(':', '.'))
-        if not screenshot.save(model.make_screenshot_name(self.work_dir, self.time_difference), 'jpg'):
+        if not screenshot.save(model.make_screenshot_name(self.work_dir,
+                                                          self.time_difference,
+                                                          self.operators_combo.currentText(),
+                                                          self.shops_combo.currentText(),
+                                                          self.passage_combo.currentText()), 'jpg'):
             self.save_status.setText(
                 'Ошибка сохранения! Обратитесь к администратору')
             self.save_status.setStyleSheet('background-color: red')
