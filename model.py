@@ -40,9 +40,6 @@ def create_db():
 
 def make_directory(operator, shop, passage):
     today = datetime.date.today()
-    # print(operator)
-    # print(shop)
-    # print(passage)
     if not os.path.exists(f'screenshots/{operator}/{today}/{shop}/Проход {passage}'):
         os.makedirs(f'screenshots/{operator}/{today}/{shop}/Проход {passage}')
     result = f'screenshots/{operator}/{today}/{shop}/Проход {passage}'
@@ -95,7 +92,6 @@ def import_shops():
         cursor.execute(query)
         wb = openpyxl.load_workbook('shops.xlsx')  # подключение листа Excel
         sheet = wb.active
-        # range(len(sheet["A"]) - 1)
         for i in range(1, len(sheet["A"])):
             if sheet['A'][i].value:
                 query = f"""

@@ -12,7 +12,6 @@ class Window(QMainWindow):
         super().__init__()
         self.i = 0
         self.lock_flag = True
-        # setting title
         self.setWindowTitle("ssPyQt5")
         self.count_label = QLabel(f'Нажатий:', self)
         # отступ от левого края / отступ сверху / длина / высота
@@ -30,24 +29,15 @@ class Window(QMainWindow):
         self.time_label = QLabel(self)
         self.time_label.setText('Разница во времени с Москвой:')
         self.time_difference = 0
-        # setting geometry
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
         self.setGeometry(300, 700, 650, 200)
-
-        # calling method
         self.UiComponents()
-
-        # showing all the widgets
         self.show()
 
-    # method for widgets
-
     def UiComponents(self):
-        # setting geometry of button
         # отступ от левого края / отступ сверху / длина / высота
         self.main_button.setGeometry(120, 30, 100, 40)
-        # adding action to a button
         self.main_button.clicked.connect(self.clickme)
 
         # кнопка блокировки
@@ -56,7 +46,6 @@ class Window(QMainWindow):
         self.lock_button.setStyleSheet("background-image : url(lock.png);")
         self.lock_button.clicked.connect(self.lock)
 
-        # creating a count_label to display a name
         button_label = QLabel(self)
         button_label.setText(
             'Нажмите на кнопку\n    или на пробел')
@@ -105,8 +94,6 @@ class Window(QMainWindow):
     def clickme(self):
         screen = QtWidgets.QApplication.primaryScreen()
         screenshot = screen.grabWindow(0, 0, 0, -1, -1)
-        # now = datetime.datetime.now()
-        # time = (str(now).replace(':', '.'))
         if not screenshot.save(model.make_screenshot_name(self.work_dir,
                                                           self.time_difference,
                                                           self.operators_combo.currentText(),
@@ -126,7 +113,6 @@ class Window(QMainWindow):
             self.shops_combo.setEnabled(False)
             self.operators_combo.setEnabled(False)
             self.passage_combo.setEnabled(False)
-            # self.gmt_combo.setEnabled(False)
             self.lock_flag = False
             self.work_dir = model.make_directory(self.operators_combo.currentText(),
                                                  self.shops_combo.currentText(),
@@ -145,12 +131,8 @@ class Window(QMainWindow):
             self.operators_combo.setEnabled(True)
             self.passage_combo.setEnabled(True)
             self.lock_flag = True
-        # self.work_dir_label.setText(f'Рабочая директория: ')
 
 
 App = QApplication(sys.argv)
-
-# create the instance of our Window
 window = Window()
-# start the app
 sys.exit(App.exec())
