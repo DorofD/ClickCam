@@ -9,6 +9,7 @@ def create_db():
     conn = sq.connect('database.db')
     cursor = conn.cursor()
     query = """CREATE TABLE IF NOT EXISTS shops (
+        pid INTEGER UNIQUE,
         shop_name TEXT NOT NULL UNIQUE,
         time_difference INTEGER
     )
@@ -35,6 +36,16 @@ def create_db():
     """
     cursor.execute(query)
 
+    query = """CREATE TABLE IF NOT EXISTS cams (
+    pid INTEGER,
+    shop_name TEXT NOT NULL,
+    passage TEXT,
+    ip TEXT,
+    login TEXT,
+    password TEXT)
+    """
+    cursor.execute(query)
+
     conn.commit()
     conn.close()
 
@@ -57,7 +68,7 @@ def get_shops():
         conn.close()
         result = []
         for shop in shops:
-            result.append(f'{str(shop[0])}')
+            result.append(f'{str(shop[1])}')
         return result
     except Exception as exc:
         print(exc)
@@ -96,9 +107,41 @@ def import_shops():
         for i in range(1, len(sheet["A"])):
             if sheet['A'][i].value:
                 query = f"""
-                    INSERT INTO shops (shop_name, time_difference)
+                    INSERT INTO shops (pid, shop_name, time_difference)
                     VALUES ('{sheet['A'][i].value}',
-                    '{sheet['B'][i].value}')
+                    '{sheet['B'][i].value}',
+                    '{sheet['C'][i].value}')
+                """
+                cursor.execute(query)
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
+
+
+def import_cams():
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = """
+            DELETE FROM cams
+        """
+        cursor.execute(query)
+        wb = openpyxl.load_workbook('cams.xlsx')  # подключение листа Excel
+        sheet = wb.active
+        for i in range(1, len(sheet["A"])):
+            if sheet['A'][i].value:
+                query = f"""
+                    INSERT INTO cams (pid, shop_name, passage, ip, login, password)
+                    VALUES ('{sheet['A'][i].value}',
+                    '{sheet['B'][i].value}',
+                    '{sheet['C'][i].value}',
+                    '{sheet['D'][i].value}',
+                    '{sheet['E'][i].value}',
+                    '{sheet['F'][i].value}')
                 """
                 cursor.execute(query)
         conn.commit()
@@ -172,6 +215,8 @@ def open_camera(address):
         'c:\\program files\\internet explorer\\iexplore.exe')
     ie.open(f'http://{address}', new=0)
 
-# create_db()
-# print(import_shops())
+
+create_db()
+print(import_shops())
+print(import_cams())
 # print(find_time_difference('945 Хабаровск 2 (город)'))
