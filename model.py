@@ -2,6 +2,7 @@ import sqlite3 as sq
 import os
 import datetime
 import openpyxl
+import webbrowser
 
 
 def create_db():
@@ -165,6 +166,11 @@ def add_note(operator, date, time_msk, time_local, shop_name, passage, path):
         conn.close()
         return False
 
+
+def open_camera(address):
+    ie = webbrowser.get(
+        'c:\\program files\\internet explorer\\iexplore.exe')
+    ie.open(f'http://{address}', new=0)
 
 # create_db()
 # print(import_shops())

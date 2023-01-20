@@ -10,9 +10,10 @@ import model
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.i = 0
         self.lock_flag = True
-        self.setWindowTitle("ssPyQt5")
+        self.setWindowTitle('ssPyQt5')
         self.count_label = QLabel(f'Нажатий:', self)
         # отступ от левого края / отступ сверху / длина / высота
         self.count_label.setGeometry(20, 30, 100, 40)
@@ -20,18 +21,24 @@ class Window(QMainWindow):
         self.operators_combo = QComboBox(self)
         self.passage_combo = QComboBox(self)
         self.lock_button = QPushButton(self)
-        self.main_button = QPushButton("Нажать!", self)
+        self.copy_login_button = QPushButton(self)
+        self.copy_password_button = QPushButton(self)
+        self.main_button = QPushButton('Открыть камеру', self)
         self.main_button.setEnabled(False)
         self.work_dir = ''
+        self.count_mode = False
         self.work_dir_label = QLabel('Рабочая директория: ', self)
         self.save_status = QLabel('', self)
         self.save_status.setGeometry(20, 120, 270, 40)
         self.time_label = QLabel(self)
         self.time_label.setText('Разница во времени с Москвой:')
         self.time_difference = 0
+        self.login_label = QLabel(self)
+        self.password_label = QLabel(self)
+        self.clipboard = QtWidgets.QApplication.clipboard()
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
-        self.setGeometry(300, 700, 650, 200)
+        self.setGeometry(300, 700, 1050, 200)
         self.UiComponents()
         self.show()
 
@@ -42,9 +49,27 @@ class Window(QMainWindow):
 
         # кнопка блокировки
         # отступ от левого края / отступ сверху / длина / высота
-        self.lock_button.setGeometry(580, 75, 35, 35)
-        self.lock_button.setStyleSheet("background-image : url(lock.png);")
+        self.lock_button.setGeometry(880, 75, 35, 35)
+        self.lock_button.setStyleSheet('background-image : url(lock.png);')
         self.lock_button.clicked.connect(self.lock)
+
+        # кнопка копирования логина
+        # отступ от левого края / отступ сверху / длина / высота
+        self.copy_login_button.setGeometry(550, 25, 35, 35)
+        self.copy_login_button.setStyleSheet(
+            'background-image : url(copy.png);')
+        self.copy_login_button.clicked.connect(self.copy_login)
+        self.login_label.setText('Логин: ')
+        self.login_label.setGeometry(350, 25, 100, 35)
+
+        # кнопка копирования пароля
+        # отступ от левого края / отступ сверху / длина / высота
+        self.copy_password_button.setGeometry(550, 75, 35, 35)
+        self.copy_password_button.setStyleSheet(
+            'background-image : url(copy.png);')
+        self.copy_password_button.clicked.connect(self.copy_password)
+        self.password_label.setText('Пароль: ')
+        self.password_label.setGeometry(350, 75, 100, 35)
 
         button_label = QLabel(self)
         button_label.setText(
@@ -56,54 +81,60 @@ class Window(QMainWindow):
         for shop in shops:
             self.shops_combo.addItem(shop)
         self.shops_combo.resize(200, 30)
-        self.shops_combo.move(360, 55)
+        self.shops_combo.move(660, 55)
 
         shops_label = QLabel(self)
         shops_label.setText('Магазин:')
-        shops_label.move(300, 55)
+        shops_label.move(600, 55)
 
         # список операторов
         operators = model.get_operators()
         for operator in operators:
             self.operators_combo.addItem(operator)
         self.operators_combo.resize(200, 30)
-        self.operators_combo.move(360, 15)
+        self.operators_combo.move(660, 15)
 
         operators_label = QLabel(self)
         operators_label.setText('Оператор:')
-        operators_label.move(300, 15)
+        operators_label.move(600, 15)
 
         # список проходов
-        for i in range(1, 7):
+        for i in range(1, 6):
             self.passage_combo.addItem(str(i))
         self.passage_combo.resize(200, 30)
-        self.passage_combo.move(360, 95)
+        self.passage_combo.move(660, 95)
 
         passage_label = QLabel(self)
         passage_label.setText('Проход:')
-        passage_label.move(300, 95)
+        passage_label.move(600, 95)
 
         # разница во времени
         self.time_label.resize(200, 30)
-        self.time_label.move(300, 135)
+        self.time_label.move(600, 135)
 
         # рабочая директория
         self.work_dir_label.move(50, 170)
         self.work_dir_label.resize(600, 30)
 
     def clickme(self):
-        screen = QtWidgets.QApplication.primaryScreen()
-        screenshot = screen.grabWindow(0, 0, 0, -1, -1)
-        if not screenshot.save(model.make_screenshot_name(self.work_dir,
-                                                          self.time_difference,
-                                                          self.operators_combo.currentText(),
-                                                          self.shops_combo.currentText(),
-                                                          self.passage_combo.currentText()), 'jpg'):
-            self.save_status.setText(
-                'Ошибка сохранения! Обратитесь к администратору')
-            self.save_status.setStyleSheet('background-color: red')
-        self.i += 1
-        self.count_label.setText(f'Нажатий: {self.i}')
+        if self.count_mode:
+            screen = QtWidgets.QApplication.primaryScreen()
+            screenshot = screen.grabWindow(0, 0, 0, -1, -1)
+            if not screenshot.save(model.make_screenshot_name(self.work_dir,
+                                                              self.time_difference,
+                                                              self.operators_combo.currentText(),
+                                                              self.shops_combo.currentText(),
+                                                              self.passage_combo.currentText()), 'jpg'):
+                self.save_status.setText(
+                    'Ошибка сохранения! Обратитесь к администратору')
+                self.save_status.setStyleSheet('background-color: red')
+            self.i += 1
+            self.clipboard.setText(str(self.i))
+            self.count_label.setText(f'Нажатий: {self.i}')
+        else:
+            model.open_camera('172.16.31.103')
+            self.main_button.setText('Считать')
+            self.count_mode = True
 
     def lock(self):
         if self.lock_flag:
@@ -130,7 +161,15 @@ class Window(QMainWindow):
             self.shops_combo.setEnabled(True)
             self.operators_combo.setEnabled(True)
             self.passage_combo.setEnabled(True)
+            self.main_button.setText('Открыть камеру')
             self.lock_flag = True
+            self.count_mode = False
+
+    def copy_login(self):
+        print('login')
+
+    def copy_password(self):
+        print('password')
 
 
 App = QApplication(sys.argv)
