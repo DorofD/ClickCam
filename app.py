@@ -26,7 +26,7 @@ class Window(QMainWindow):
         self.main_button = QPushButton('Открыть камеру', self)
         self.main_button.setEnabled(False)
         self.work_dir = ''
-        self.count_mode = False
+        self.count_mode = 0
         self.work_dir_label = QLabel('Рабочая директория: ', self)
         self.save_status = QLabel('', self)
         self.save_status.setGeometry(20, 120, 270, 40)
@@ -34,9 +34,9 @@ class Window(QMainWindow):
         self.time_label.setText('Разница во времени с Москвой:')
         self.time_difference = 0
         self.login_label = QLabel(self)
-        self.login_value = QLabel(self)
+        self.login_value = 'login'
         self.password_label = QLabel(self)
-        self.password_value = QLabel(self)
+        self.password_value = 'password'
         self.clipboard = QtWidgets.QApplication.clipboard()
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
@@ -70,9 +70,7 @@ class Window(QMainWindow):
             'background-image : url(copy.png);')
         self.copy_login_button.clicked.connect(self.copy_login)
         self.login_label.setText('Логин: ')
-        self.login_label.setGeometry(350, 25, 100, 35)
-        self.login_value.setText('login')
-        self.login_value.setGeometry(400, 25, 100, 35)
+        self.login_label.setGeometry(350, 25, 140, 35)
 
         # кнопка копирования пароля
         # отступ от левого края / отступ сверху / длина / высота
@@ -81,9 +79,7 @@ class Window(QMainWindow):
             'background-image : url(copy.png);')
         self.copy_password_button.clicked.connect(self.copy_password)
         self.password_label.setText('Пароль: ')
-        self.password_label.setGeometry(350, 75, 100, 35)
-        self.password_value.setText('password')
-        self.password_value.setGeometry(400, 75, 100, 35)
+        self.password_label.setGeometry(350, 75, 140, 35)
 
         # список магазинов
         shops = model.get_shops()
@@ -126,7 +122,7 @@ class Window(QMainWindow):
         self.work_dir_label.resize(600, 30)
 
     def clickme(self):
-        if self.count_mode:
+        if self.count_mode == 2:
             screen = QtWidgets.QApplication.primaryScreen()
             screenshot = screen.grabWindow(0, 0, 0, -1, -1)
             if not screenshot.save(model.make_screenshot_name(self.work_dir,
@@ -138,12 +134,14 @@ class Window(QMainWindow):
                     'Ошибка сохранения! Обратитесь к администратору')
                 self.save_status.setStyleSheet('background-color: red')
             self.i += 1
-            self.clipboard.setText(str(self.i))
             self.count_label.setText(f'Нажатий: {self.i}')
-        else:
+        elif self.count_mode == 0:
             model.open_camera('172.16.31.103')
+            self.main_button.setText('Начать')
+            self.count_mode = 1
+        else:
+            self.count_mode = 2
             self.main_button.setText('Считать')
-            self.count_mode = True
 
     def lock(self):
         if self.lock_flag:
@@ -159,7 +157,8 @@ class Window(QMainWindow):
                                                  self.passage_combo.currentText())
             self.time_difference = model.find_time_difference(
                 self.shops_combo.currentText())
-
+            self.login_label.setText(f'Логин: {self.login_value}')
+            self.password_label.setText(f'Пароль: {self.password_value}')
             self.time_label.setText(
                 f'Разница во времени с Москвой: {self.time_difference}')
             self.work_dir_label.setText(f'Рабочая директория: {self.work_dir}')
@@ -172,13 +171,13 @@ class Window(QMainWindow):
             self.passage_combo.setEnabled(True)
             self.main_button.setText('Открыть камеру')
             self.lock_flag = True
-            self.count_mode = False
+            self.count_mode = 0
 
     def copy_login(self):
-        print('login')
+        self.clipboard.setText(self.login_value)
 
     def copy_password(self):
-        print('password')
+        self.clipboard.setText(self.password_value)
 
 
 App = QApplication(sys.argv)
