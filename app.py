@@ -10,13 +10,13 @@ import model
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setStyleSheet("QLabel, QPushButton, QComboBox {font: 10pt}")
+        self.setWindowIcon(QIcon('icon.png'))
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.i = 0
         self.lock_flag = True
         self.setWindowTitle('ssPyQt5')
         self.count_label = QLabel(f'Нажатий:', self)
-        # отступ от левого края / отступ сверху / длина / высота
-        self.count_label.setGeometry(20, 30, 100, 40)
         self.shops_combo = QComboBox(self)
         self.operators_combo = QComboBox(self)
         self.passage_combo = QComboBox(self)
@@ -34,7 +34,9 @@ class Window(QMainWindow):
         self.time_label.setText('Разница во времени с Москвой:')
         self.time_difference = 0
         self.login_label = QLabel(self)
+        self.login_value = QLabel(self)
         self.password_label = QLabel(self)
+        self.password_value = QLabel(self)
         self.clipboard = QtWidgets.QApplication.clipboard()
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
@@ -43,74 +45,81 @@ class Window(QMainWindow):
         self.show()
 
     def UiComponents(self):
+        # кнопка счётчика
         # отступ от левого края / отступ сверху / длина / высота
-        self.main_button.setGeometry(120, 30, 100, 40)
+        self.main_button.setGeometry(120, 30, 120, 40)
         self.main_button.clicked.connect(self.clickme)
+        # лейбл кнопки счетчика
+        button_label = QLabel(self)
+        button_label.setText(
+            'Нажмите на кнопку\n    или на пробел')
+        button_label.setGeometry(120, 70, 200, 40)
+        # лейбл значения счётчика
+        self.count_label.setGeometry(20, 30, 100, 40)
 
         # кнопка блокировки
         # отступ от левого края / отступ сверху / длина / высота
-        self.lock_button.setGeometry(880, 75, 35, 35)
+        self.lock_button.setGeometry(910, 75, 35, 35)
         self.lock_button.setStyleSheet('background-image : url(lock.png);')
         self.lock_button.clicked.connect(self.lock)
 
         # кнопка копирования логина
         # отступ от левого края / отступ сверху / длина / высота
-        self.copy_login_button.setGeometry(550, 25, 35, 35)
+        self.copy_login_button.setGeometry(500, 25, 35, 35)
         self.copy_login_button.setStyleSheet(
             'background-image : url(copy.png);')
         self.copy_login_button.clicked.connect(self.copy_login)
         self.login_label.setText('Логин: ')
         self.login_label.setGeometry(350, 25, 100, 35)
+        self.login_value.setText('login')
+        self.login_value.setGeometry(400, 25, 100, 35)
 
         # кнопка копирования пароля
         # отступ от левого края / отступ сверху / длина / высота
-        self.copy_password_button.setGeometry(550, 75, 35, 35)
+        self.copy_password_button.setGeometry(500, 75, 35, 35)
         self.copy_password_button.setStyleSheet(
             'background-image : url(copy.png);')
         self.copy_password_button.clicked.connect(self.copy_password)
         self.password_label.setText('Пароль: ')
         self.password_label.setGeometry(350, 75, 100, 35)
-
-        button_label = QLabel(self)
-        button_label.setText(
-            'Нажмите на кнопку\n    или на пробел')
-        button_label.move(120, 70)
+        self.password_value.setText('password')
+        self.password_value.setGeometry(400, 75, 100, 35)
 
         # список магазинов
         shops = model.get_shops()
         for shop in shops:
             self.shops_combo.addItem(shop)
         self.shops_combo.resize(200, 30)
-        self.shops_combo.move(660, 55)
+        self.shops_combo.move(690, 55)
 
         shops_label = QLabel(self)
         shops_label.setText('Магазин:')
-        shops_label.move(600, 55)
+        shops_label.move(620, 55)
 
         # список операторов
         operators = model.get_operators()
         for operator in operators:
             self.operators_combo.addItem(operator)
         self.operators_combo.resize(200, 30)
-        self.operators_combo.move(660, 15)
+        self.operators_combo.move(690, 15)
 
         operators_label = QLabel(self)
         operators_label.setText('Оператор:')
-        operators_label.move(600, 15)
+        operators_label.move(620, 15)
 
         # список проходов
         for i in range(1, 6):
             self.passage_combo.addItem(str(i))
         self.passage_combo.resize(200, 30)
-        self.passage_combo.move(660, 95)
+        self.passage_combo.move(690, 95)
 
         passage_label = QLabel(self)
         passage_label.setText('Проход:')
-        passage_label.move(600, 95)
+        passage_label.move(620, 95)
 
         # разница во времени
         self.time_label.resize(200, 30)
-        self.time_label.move(600, 135)
+        self.time_label.move(620, 135)
 
         # рабочая директория
         self.work_dir_label.move(50, 170)
