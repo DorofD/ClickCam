@@ -50,23 +50,6 @@ def create_db():
     conn.close()
 
 
-def add_opeartors():
-    conn = sq.connect('database.db')
-    cursor = conn.cursor()
-    query = """
-            DELETE FROM operators
-        """
-    cursor.execute(query)
-    for i in range(1, 6):
-        query = f"""
-                        INSERT INTO operators (username)
-                        VALUES ('Оператор {i}')
-                    """
-        cursor.execute(query)
-    conn.commit()
-    conn.close()
-
-
 def make_directory(operator, shop, passage):
     today = datetime.date.today()
     if not os.path.exists(f'screenshots/{operator}/{today}/{shop}/Проход {passage}'):
@@ -93,18 +76,37 @@ def get_shops():
         return False
 
 
-def get_operators():
+def get_operator():
     try:
         conn = sq.connect('database.db')
         cursor = conn.cursor()
         query = f"""SELECT * FROM operators"""
         cursor.execute(query)
-        operators = cursor.fetchall()
+        result = cursor.fetchall()
         conn.close()
-        result = []
-        for operator in operators:
-            result.append(str(operator[0]))
-        return result
+        return result[0][0]
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return 'Нет оператора'
+
+
+def set_operator(operator):
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = """
+                DELETE FROM operators
+            """
+        cursor.execute(query)
+        query = f"""
+                INSERT INTO operators (username)
+                VALUES ('{operator}')
+            """
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        return True
     except Exception as exc:
         print(exc)
         conn.close()

@@ -41,6 +41,12 @@ class Window(QMainWindow):
         self.cam_address_label.setText('Камера: ')
         self.cam_address_value = ''
         self.clipboard = QtWidgets.QApplication.clipboard()
+        self.operator_input_password = QLineEdit(self)
+        self.operator_input_password.setEchoMode(QLineEdit.Password)
+        self.operator_value = model.get_operator()
+        self.operators_label = QLabel(self)
+        self.operators_label.setText(f'Оператор: {self.operator_value}')
+        self.set_operator_button = QPushButton(self)
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
         self.setGeometry(300, 700, 1050, 200)
@@ -99,15 +105,19 @@ class Window(QMainWindow):
         shops_label.move(620, 55)
 
         # список операторов
-        operators = model.get_operators()
-        for operator in operators:
-            self.operators_combo.addItem(operator)
-        self.operators_combo.resize(200, 30)
-        self.operators_combo.move(690, 15)
+        for i in range(1, 6):
+            self.operators_combo.addItem(f'Оператор {i}')
+        self.operators_combo.resize(100, 30)
+        self.operators_combo.move(790, 15)
 
-        operators_label = QLabel(self)
-        operators_label.setText('Оператор:')
-        operators_label.move(620, 15)
+        self.operators_label.setGeometry(620, 15, 160, 30)
+        # пароль для смены оператора
+        self.operator_input_password.setGeometry(895, 15, 40, 30)
+        # кнопка сохранения оператора
+        self.set_operator_button.setGeometry(940, 12, 34, 34)
+        self.set_operator_button.setStyleSheet(
+            'background-image : url(set.png);')
+        self.set_operator_button.clicked.connect(self.set_operator)
 
         # список проходов
         for i in range(1, 6):
@@ -120,7 +130,7 @@ class Window(QMainWindow):
         passage_label.move(620, 95)
 
         # разница во времени
-        self.time_label.resize(200, 30)
+        self.time_label.resize(210, 30)
         self.time_label.move(620, 135)
 
         # рабочая директория
@@ -133,7 +143,7 @@ class Window(QMainWindow):
             screenshot = screen.grabWindow(0, 0, 0, -1, -1)
             if not screenshot.save(model.make_screenshot_name(self.work_dir,
                                                               self.time_difference,
-                                                              self.operators_combo.currentText(),
+                                                              self.operator_value,
                                                               self.shops_combo.currentText(),
                                                               self.passage_combo.currentText()), 'jpg'):
                 self.save_status.setText(
@@ -158,7 +168,7 @@ class Window(QMainWindow):
             self.operators_combo.setEnabled(False)
             self.passage_combo.setEnabled(False)
             self.lock_flag = False
-            self.work_dir = model.make_directory(self.operators_combo.currentText(),
+            self.work_dir = model.make_directory(self.operator_value,
                                                  self.shops_combo.currentText(),
                                                  self.passage_combo.currentText())
             self.time_difference = model.find_time_difference(
@@ -177,7 +187,7 @@ class Window(QMainWindow):
             self.password_label.setText(f'Пароль: {self.password_value}')
             self.cam_address_label.setText(f'Камера: {self.cam_address_value}')
             self.time_label.setText(
-                f'Разница во времени с Москвой: {self.time_difference}')
+                f'Разница во времени с Москвой: +{self.time_difference}')
             self.work_dir_label.setText(f'Рабочая директория: {self.work_dir}')
         else:
             # деактивация кнопки счетчика
@@ -195,6 +205,16 @@ class Window(QMainWindow):
 
     def copy_password(self):
         self.clipboard.setText(self.password_value)
+
+    def set_operator(self):
+        if self.operator_input_password.text() == '1488':
+            self.operator_value = self.operators_combo.currentText()
+            if model.set_operator(self.operator_value):
+                self.operators_label.setText(
+                    f'Оператор: {self.operator_value}')
+                self.operator_input_password.clear()
+            else:
+                print('Ошибка добавления оператора')
 
 
 App = QApplication(sys.argv)
