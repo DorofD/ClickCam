@@ -24,6 +24,7 @@ class Window(QMainWindow):
         self.copy_login_button = QPushButton(self)
         self.copy_password_button = QPushButton(self)
         self.main_button = QPushButton('Открыть камеру', self)
+        self.problem_button = QPushButton('Проблема с камерой', self)
         self.main_button.setEnabled(False)
         self.work_dir = ''
         self.count_mode = 0
@@ -47,6 +48,9 @@ class Window(QMainWindow):
         self.operators_label = QLabel(self)
         self.operators_label.setText(f'Оператор: {self.operator_value}')
         self.set_operator_button = QPushButton(self)
+        self.problem_description = QLineEdit(self)
+        self.problem_description.setPlaceholderText(
+            'Проблема с камерой?')
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
         self.setGeometry(300, 700, 1050, 200)
@@ -65,6 +69,15 @@ class Window(QMainWindow):
         button_label.setGeometry(120, 70, 200, 40)
         # лейбл значения счётчика
         self.count_label.setGeometry(20, 30, 100, 40)
+
+        # кнопка проблемы с камерой
+        # отступ от левого края / отступ сверху / длина / высота
+        self.problem_button.setGeometry(50, 150, 210, 25)
+        # (operator, time, address, problem_description)
+        self.problem_button.clicked.connect(self.cam_problem_report)
+        # описание проблемы
+        self.problem_description.setGeometry(50, 120, 210, 25)
+        self.problem_description.setMaxLength(50)
 
         # кнопка блокировки
         # отступ от левого края / отступ сверху / длина / высота
@@ -134,7 +147,7 @@ class Window(QMainWindow):
         self.time_label.move(620, 135)
 
         # рабочая директория
-        self.work_dir_label.move(50, 170)
+        self.work_dir_label.move(350, 170)
         self.work_dir_label.resize(600, 30)
 
     def clickme(self):
@@ -215,6 +228,14 @@ class Window(QMainWindow):
                 self.operator_input_password.clear()
             else:
                 print('Ошибка добавления оператора')
+
+    def cam_problem_report(self):
+        if model.cam_problem_report(self.operator_value, self.shops_combo.currentText(
+        ), self.cam_address_value, self.problem_description.text()):
+            self.problem_description.clear()
+        else:
+            self.problem_description.setPlaceholderText(
+                'Ошибка отправки')
 
 
 App = QApplication(sys.argv)

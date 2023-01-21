@@ -46,6 +46,15 @@ def create_db():
     """
     cursor.execute(query)
 
+    query = """CREATE TABLE IF NOT EXISTS problems(
+    operator TEXT,
+    time TEXT,
+    shop TEXT,
+    ip TEXT,
+    description TEXT)
+    """
+    cursor.execute(query)
+
     conn.commit()
     conn.close()
 
@@ -252,6 +261,29 @@ def open_camera(address):
     ie = webbrowser.get(
         'c:\\program files\\internet explorer\\iexplore.exe')
     ie.open(f'http://{address}', new=0)
+
+
+def cam_problem_report(operator, shop, ip, description):
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = f"""
+                INSERT INTO problems (operator, time, shop, ip, description)
+                VALUES ('{operator}',
+                '{str(datetime.datetime.now())}',
+                '{shop}',
+                '{ip}',
+                '{description}'
+                )
+            """
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
 
 
 # create_db()
