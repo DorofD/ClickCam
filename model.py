@@ -50,6 +50,23 @@ def create_db():
     conn.close()
 
 
+def add_opeartors():
+    conn = sq.connect('database.db')
+    cursor = conn.cursor()
+    query = """
+            DELETE FROM operators
+        """
+    cursor.execute(query)
+    for i in range(1, 6):
+        query = f"""
+                        INSERT INTO operators (username)
+                        VALUES ('Оператор {i}')
+                    """
+        cursor.execute(query)
+    conn.commit()
+    conn.close()
+
+
 def make_directory(operator, shop, passage):
     today = datetime.date.today()
     if not os.path.exists(f'screenshots/{operator}/{today}/{shop}/Проход {passage}'):
@@ -210,13 +227,35 @@ def add_note(operator, date, time_msk, time_local, shop_name, passage, path):
         return False
 
 
+def get_cam_connection(shop, passage):
+    try:
+        print(shop)
+        print(passage)
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = f"""SELECT ip, login, password FROM cams
+                    WHERE shop_name ='{shop}' AND passage = '{passage}'"""
+        cursor.execute(query)
+        result = cursor.fetchall()
+        conn.commit()
+        conn.close()
+        return result[0]
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
+
+
 def open_camera(address):
     ie = webbrowser.get(
         'c:\\program files\\internet explorer\\iexplore.exe')
     ie.open(f'http://{address}', new=0)
 
 
-create_db()
-print(import_shops())
-print(import_cams())
+# create_db()
+# print(import_shops())
+# print(import_cams())
+# add_opeartors()
 # print(find_time_difference('945 Хабаровск 2 (город)'))
+
+# get_cam_connection('Ханты-Мансийск (город)', '1')

@@ -37,6 +37,9 @@ class Window(QMainWindow):
         self.login_value = 'login'
         self.password_label = QLabel(self)
         self.password_value = 'password'
+        self.cam_address_label = QLabel(self)
+        self.cam_address_label.setText('Камера: ')
+        self.cam_address_value = ''
         self.clipboard = QtWidgets.QApplication.clipboard()
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
@@ -80,6 +83,9 @@ class Window(QMainWindow):
         self.copy_password_button.clicked.connect(self.copy_password)
         self.password_label.setText('Пароль: ')
         self.password_label.setGeometry(350, 75, 140, 35)
+
+        # адрес камеры
+        self.cam_address_label.setGeometry(350, 125, 140, 35)
 
         # список магазинов
         shops = model.get_shops()
@@ -136,7 +142,7 @@ class Window(QMainWindow):
             self.i += 1
             self.count_label.setText(f'Нажатий: {self.i}')
         elif self.count_mode == 0:
-            model.open_camera('172.16.31.103')
+            model.open_camera(self.cam_address_value)
             self.main_button.setText('Начать')
             self.count_mode = 1
         else:
@@ -157,8 +163,19 @@ class Window(QMainWindow):
                                                  self.passage_combo.currentText())
             self.time_difference = model.find_time_difference(
                 self.shops_combo.currentText())
+            cam_connection = model.get_cam_connection(
+                self.shops_combo.currentText(), self.passage_combo.currentText())
+            if cam_connection:
+                self.cam_address_value = cam_connection[0]
+                self.login_value = cam_connection[1]
+                self.password_value = cam_connection[2]
+            else:
+                self.cam_address_value = 'Нет камеры!'
+                self.login_value = 'Нет камеры!'
+                self.password_value = 'Нет камеры!'
             self.login_label.setText(f'Логин: {self.login_value}')
             self.password_label.setText(f'Пароль: {self.password_value}')
+            self.cam_address_label.setText(f'Камера: {self.cam_address_value}')
             self.time_label.setText(
                 f'Разница во времени с Москвой: {self.time_difference}')
             self.work_dir_label.setText(f'Рабочая директория: {self.work_dir}')
