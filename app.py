@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import sys
 import model
+import time
 # pyinstaller main.spec
 
 
@@ -51,6 +52,14 @@ class Window(QMainWindow):
         self.problem_description = QLineEdit(self)
         self.problem_description.setPlaceholderText(
             'Проблема с камерой?')
+        # таймер
+        self.time = 0
+        self.timeInterval = 1000  # 1 секунда
+
+        self.timer_label = QLabel(self)
+        self.timer = QTimer()
+        self.timer.setInterval(self.timeInterval)
+        self.timer.timeout.connect(self.updateUptime)
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
         self.setGeometry(300, 700, 1050, 200)
@@ -67,8 +76,10 @@ class Window(QMainWindow):
         button_label.setText(
             'Нажмите на кнопку\n    или на пробел')
         button_label.setGeometry(120, 70, 200, 40)
-        # лейбл значения счётчика
+        # лейбл значения счётчика нажатий
         self.count_label.setGeometry(20, 30, 100, 40)
+        # лейбл таймера
+        self.timer_label.setGeometry(20, 5, 220, 20)
 
         # кнопка проблемы с камерой
         # отступ от левого края / отступ сверху / длина / высота
@@ -171,6 +182,11 @@ class Window(QMainWindow):
         else:
             self.count_mode = 2
             self.main_button.setText('Считать')
+            # запись о начале интервала подсчета
+            model.set_time_interval(self.operator_value, self.shops_combo.currentText(
+            ), self.passage_combo.currentText(), 'start')
+            # активация таймера
+            self.timer.start()
 
     def lock(self):
         if self.lock_flag:
@@ -212,6 +228,13 @@ class Window(QMainWindow):
             self.main_button.setText('Открыть камеру')
             self.lock_flag = True
             self.count_mode = 0
+            # запись о завершении интервала подсчета
+            model.set_time_interval(self.operator_value, self.shops_combo.currentText(
+            ), self.passage_combo.currentText(), 'end')
+            # остановка и сброс таймера
+            self.timer.stop()
+            self.time = 0
+            self.timer_label.setStyleSheet('')
 
     def copy_login(self):
         self.clipboard.setText(self.login_value)
@@ -236,6 +259,18 @@ class Window(QMainWindow):
         else:
             self.problem_description.setPlaceholderText(
                 'Ошибка отправки')
+
+    def updateUptime(self):
+        self.time += 1
+        self.settimer(self.time)
+
+    def settimer(self, int):
+        self.time = int
+        if self.time > 3600:
+            self.timer_label.setStyleSheet('background-color: green')
+
+        self.timer_label.setText(time.strftime(
+            'Часы: %H  Минуты: %M Секунды: %S', time.gmtime(self.time)))
 
 
 App = QApplication(sys.argv)

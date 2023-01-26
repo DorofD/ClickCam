@@ -55,6 +55,15 @@ def create_db():
     """
     cursor.execute(query)
 
+    query = """CREATE TABLE IF NOT EXISTS intervals(
+    operator TEXT,
+    time TEXT,
+    shop TEXT,
+    passage TEXT,
+    status TEXT)
+    """
+    cursor.execute(query)
+
     conn.commit()
     conn.close()
 
@@ -274,6 +283,29 @@ def cam_problem_report(operator, shop, ip, description):
                 '{shop}',
                 '{ip}',
                 '{description}'
+                )
+            """
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as exc:
+        print(exc)
+        conn.close()
+        return False
+
+
+def set_time_interval(operator, shop, passage, status):
+    try:
+        conn = sq.connect('database.db')
+        cursor = conn.cursor()
+        query = f"""
+                INSERT INTO intervals (operator, time, shop, passage, status)
+                VALUES ('{operator}',
+                '{str(datetime.datetime.now())}',
+                '{shop}',
+                '{passage}',
+                '{status}'
                 )
             """
         cursor.execute(query)
