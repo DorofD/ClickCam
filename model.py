@@ -222,7 +222,8 @@ def make_screenshot_name(work_dir, difference, operator, shop_name, passage):
 
 def make_record_name(work_dir, shop_name):
     time = (str(datetime.datetime.now()).replace(':', '.'))
-    result = f'{work_dir}/RECORD {shop_name} {time}.avi'
+    # result = f'{work_dir}/RECORD {shop_name} {time}.avi'
+    result = f'{work_dir}/RECORD {shop_name} {time}.mp4'
     return result
 
 

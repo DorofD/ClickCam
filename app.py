@@ -288,7 +288,8 @@ class Window(QMainWindow):
 
         resolution = tuple(pyautogui.size())
         fps = 12.0
-        codec = cv2.VideoWriter_fourcc(*"MJPG")
+        # codec = cv2.VideoWriter_fourcc(*"MJPG")
+        codec = cv2.VideoWriter_fourcc(*"MP4V")
         filename = model.make_record_name(
             self.work_dir, self.shops_combo.currentText())
         writer = cv2.VideoWriter(str(filename), codec, fps, resolution)
