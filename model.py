@@ -220,6 +220,12 @@ def make_screenshot_name(work_dir, difference, operator, shop_name, passage):
     return result
 
 
+def make_record_name(work_dir, shop_name):
+    time = (str(datetime.datetime.now()).replace(':', '.'))
+    result = f'{work_dir}/RECORD {shop_name} {time}.avi'
+    return result
+
+
 def add_note(operator, date, time_msk, time_local, shop_name, passage, path):
     try:
         ss_path = path.replace('/', '\\')

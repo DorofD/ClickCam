@@ -5,6 +5,11 @@ from PyQt5.QtCore import *
 import sys
 import model
 import time
+# recorder
+import pyautogui
+import cv2
+import numpy as np
+import threading
 # pyinstaller main.spec
 
 
@@ -60,6 +65,7 @@ class Window(QMainWindow):
         self.timer = QTimer()
         self.timer.setInterval(self.timeInterval)
         self.timer.timeout.connect(self.updateUptime)
+        self.recorder_up = True
         # главное окно
         # отступ от левого края / отступ сверху / длина / высота
         self.setGeometry(300, 700, 1050, 200)
@@ -187,6 +193,10 @@ class Window(QMainWindow):
             ), self.passage_combo.currentText(), 'start')
             # активация таймера
             self.timer.start()
+            # активация рекордера
+            self.recorder_up = True
+            t1 = threading.Thread(target=self.recorder)
+            t1.start()
 
     def lock(self):
         if self.lock_flag:
@@ -235,6 +245,8 @@ class Window(QMainWindow):
             self.timer.stop()
             self.time = 0
             self.timer_label.setStyleSheet('')
+            # остановка рекордера
+            self.recorder_up = False
 
     def copy_login(self):
         self.clipboard.setText(self.login_value)
@@ -271,6 +283,28 @@ class Window(QMainWindow):
 
         self.timer_label.setText(time.strftime(
             'Часы: %H  Минуты: %M Секунды: %S', time.gmtime(self.time)))
+
+    def recorder(self):
+
+        resolution = tuple(pyautogui.size())
+        fps = 12.0
+        codec = cv2.VideoWriter_fourcc(*"MJPG")
+        filename = model.make_record_name(
+            self.work_dir, self.shops_combo.currentText())
+        writer = cv2.VideoWriter(str(filename), codec, fps, resolution)
+
+        while True:
+            img = pyautogui.screenshot()
+            # Convert the screenshot to a numpy array
+            frame = np.array(img)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR to RGB
+            # Writing it to the output file
+            writer.write(frame)
+            if self.recorder_up == False:
+                break
+        print("Recordings saved as: "+filename)
+        writer.release()
+        cv2.destroyAllWindows()
 
 
 App = QApplication(sys.argv)
