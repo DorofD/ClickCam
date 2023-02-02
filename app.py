@@ -190,7 +190,7 @@ class Window(QMainWindow):
             self.main_button.setText('Считать')
             # запись о начале интервала подсчета
             model.set_time_interval(self.operator_value, self.shops_combo.currentText(
-            ), self.passage_combo.currentText(), 'start')
+            ), self.passage_combo.currentText(), 'start', self.time_difference)
             # активация таймера
             self.timer.start()
             # активация рекордера
@@ -240,7 +240,7 @@ class Window(QMainWindow):
             self.count_mode = 0
             # запись о завершении интервала подсчета
             model.set_time_interval(self.operator_value, self.shops_combo.currentText(
-            ), self.passage_combo.currentText(), 'end')
+            ), self.passage_combo.currentText(), 'end', self.time_difference)
             # остановка и сброс таймера
             self.timer.stop()
             self.time = 0

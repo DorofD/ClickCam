@@ -57,7 +57,9 @@ def create_db():
 
     query = """CREATE TABLE IF NOT EXISTS intervals(
     operator TEXT,
-    time TEXT,
+    date TEXT,
+    time_msk TEXT,
+    time_local TEXT,
     shop TEXT,
     passage TEXT,
     status TEXT)
@@ -302,14 +304,20 @@ def cam_problem_report(operator, shop, ip, description):
         return False
 
 
-def set_time_interval(operator, shop, passage, status):
+def set_time_interval(operator, shop, passage, status, difference):
     try:
+        today = datetime.date.today()
+        dif = datetime.timedelta(hours=difference)
+        time_msk = datetime.datetime.now()
+        time_local = time_msk + dif
         conn = sq.connect('database.db')
         cursor = conn.cursor()
         query = f"""
-                INSERT INTO intervals (operator, time, shop, passage, status)
+                INSERT INTO intervals (operator, date, time_msk, time_local, shop, passage, status)
                 VALUES ('{operator}',
-                '{str(datetime.datetime.now())}',
+                '{str(today)}',
+                '{str(time_msk)}',
+                '{str(time_local)}',
                 '{shop}',
                 '{passage}',
                 '{status}'
